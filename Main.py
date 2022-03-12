@@ -41,16 +41,13 @@ def convert(give, get):
     xrate = t/f
     return '%.5f\nUpdated at %s' % (xrate, now)
 
-def check():
-        get = update()
-        command = get.text.startswith('/x')
-        if command:
-            return get
-        else:
-            return False
-
 def action():
-    get = update()
+    try:
+        get = update()
+    except (KeyError, IndexError):
+        reset(get.update_id + 1)
+        return
+
     command = get.text.startswith('/x')
     reply = message(get.chat_id)
     if command == False:
