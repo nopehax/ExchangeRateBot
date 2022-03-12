@@ -59,7 +59,7 @@ def action():
         reply.this('the correct command is:\n/x FROM TO\ne.g. /x SGD AUD ')
     else:
         try:
-            reply.this(convert(arr[1], arr[2]))
+            reply.this(convert(arr[1].upper(), arr[2].upper()))
         except KeyError:
             reply.this('pls input a valid currency')
     reset(get.update_id + 1)
