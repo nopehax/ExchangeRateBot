@@ -10,18 +10,21 @@ class update:
         response = requests.get(URL + 'getUpdates')
         j = response.json()
         self.success = j['ok']
-        result = j['result'][-1]
+        if not self.success:
+            return
+        result = j['result'][0]
         self.update_id = int(result['update_id'])
+        self.type = list(result.keys())[1]
 
-        if 'message' not in result.keys():
-            self.isMessage = False
-        else:
+        if self.type == 'message':                      # next time can create a message object
             self.isMessage = True
             messageInfo = result['message']
             self.chat_id = messageInfo['chat']['id']
             self.text = messageInfo['text']
+        #elif:                                           # can account for other types in the future
+        #    self.type = 'some other message type'
 
-class message:
+class sendMessage:
     def __init__(self, chat):
         self.chat_id = chat
         self.link = URL + 'sendMessage'
@@ -46,24 +49,28 @@ def convert(give, get):
 
 def action():
     get = update()
-    if not get.isMessage:
+    if not get.success:
+        print('something went wrong...')
+        return
+
+    if get.type != 'message':
         reset(get.update_id)
         return
 
-    command = get.text.startswith('/x')
-    if command == False:
+    isCommand = get.text.startswith('/x')
+    if isCommand == False:
         reset(get.update_id)
         return
 
-    reply = message(get.chat_id)
+    reply = sendMessage(get.chat_id)
     arr = get.text.split()
     if len(arr) != 3:
         reply.this('the correct command is:\n/x FROM TO\ne.g. /x SGD AUD ')
     else:
         try:
             reply.this(convert(arr[1].upper(), arr[2].upper()))
-        except KeyError:
-            reply.this('pls input a valid currency')
+        except KeyError as e:
+            reply.this('pls input a valid currency\nnot ' + str(e))
     reset(get.update_id)
 
 while (True):
