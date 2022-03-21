@@ -73,13 +73,19 @@ def action():
             reply.this('pls input a valid currency\nnot ' + str(e))
     reset(get.update_id)
 
-while (True):
-    print('\nbot is running...')
-    url = URL + 'getUpdates'
+def start():
     while (True):
-        result = requests.get(url)
-        j = result.json()
-        if j['result'] == []:
-            continue
-        break
-    action()
+        print('\nbot is running...')
+        url = URL + 'getUpdates'
+        while (True):
+            result = requests.get(url)
+            j = result.json()
+            if j['result'] == []:
+                continue
+            break
+        action()
+
+try:
+    start()
+except RemoteDisconnected:
+    start()
